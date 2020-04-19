@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Mayan Puzzle Verifier</title>
+  </head>
+
+  <body>
+    <div id="Validate">
+      Your solution: <input autofocus size="23" type="text" id="textEntry"/>
+      <button class="btn default" onClick="validate()">Submit</button>
+      <p id="result">Enter your solution or clue and click Submit</p>
+    </div>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.658.0.min.js"></script>
+    <script type="text/javascript">
+
+        // Initialize the Amazon Cognito credentials provider
+        AWS.config.region = 'eu-west-1'; // Region
+        AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+            IdentityPoolId: 'eu-west-1:0791e164-b77e-4fb8-9ae3-2e8489ca9c10',
+        });
+        
+        // Function invoked by button click
+        function validate() {
+            let request = {
+                input: document.getElementById("textEntry").value
+            };
+            let lambda = new AWS.Lambda();
+            lambda.invoke({
+                FunctionName: 'mayan-temple-checker',
+                Payload: JSON.stringify(request)
+            }, function (err, data) {
+                let result = document.getElementById('result');
+                if (err) {
+                    result.innerHTML = err;
+                } else {
+                    let output = JSON.parse(data.Payload);
+                    result.innerHTML = output;
+                }
+            });
+        }
+
+    </script>
+ </body>
+</html>
